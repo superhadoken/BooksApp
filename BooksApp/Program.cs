@@ -18,6 +18,7 @@ internal class Program
             .AddScoped<IBooksApiClient, BookApiClient>()
             .AddScoped<IImportBooks, BooksImport>()
             .AddScoped<IWriteBooks, BookWriter>()
+            //TODO use something like Polly for circuit breaker policy/retry policy/etc
             .AddHttpClient<IBooksApiClient, BookApiClient>(
                 config =>
                 {

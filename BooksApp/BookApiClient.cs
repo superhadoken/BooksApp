@@ -39,10 +39,10 @@ public class BookApiClient : IBooksApiClient
     private async Task<T> DeserialiseXmlResponseAsync<T>(HttpResponseMessage response)
     {
         // Don't use `.Result` on async method and ReadAsStreamAsync to directly stream to deserialiser instead of converting to string and then streaming via StringReader
-        var xmlString = await response.Content.ReadAsStreamAsync();
+        var xmlStream = await response.Content.ReadAsStreamAsync();
 
         var serializerObj = new XmlSerializer(typeof(bookstore));
 
-        return (T)serializerObj.Deserialize(xmlString);
+        return (T)serializerObj.Deserialize(xmlStream);
     }
 }
