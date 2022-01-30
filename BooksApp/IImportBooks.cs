@@ -5,7 +5,7 @@ namespace Application;
 /// <summary>
 /// Data Orchestration to request from API and then Persist into database
 /// </summary>
-public interface IImportBooks
+internal interface IImportBooks
 {
     Task Import();
 }

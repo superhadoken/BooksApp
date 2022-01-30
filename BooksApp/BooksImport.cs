@@ -1,9 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using DataAccess;
-using System.Threading.Tasks;
+﻿using DataAccess;
 using Domain;
 using Dtos;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Application;
 
@@ -28,8 +28,8 @@ public class BooksImport : IImportBooks
         _bookWriter.SaveBooks(books);
     }
 
-    private ICollection<Book> MapDtoToBookDomain(BookstoreDto dto)
+    private ICollection<Book> MapDtoToBookDomain(bookstore dto)
     {
-        return dto.Book.Select(b => new Book(b.Category, b.Title.Value, b.Price, b.Author)).ToList();
+        return dto.book.Select(b => new Book(b.category, b.title.Value, b.price, b.author)).ToList();
     }
 }

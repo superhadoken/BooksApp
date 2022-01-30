@@ -12,7 +12,7 @@ namespace DataAccess;
 public class BookWriter : IWriteBooks
 {
     //todo don't use magic string and get from config // appsettings.json
-    private const string ConnectionString = "connString";
+    private const string ConnectionString = "Data Source=.;Initial Catalog=BooksApp;Integrated Security=True";
 
     public void SaveBooks(ICollection<Book> books)
     {
@@ -32,14 +32,21 @@ public class BookWriter : IWriteBooks
 
         try
         {
+            var bookIndex = 0;
+            var authorIndex = 0;
 
             foreach (var book in books)
             {
-                InsertBook(command, book);
+                InsertBook(command, book, bookIndex);
+                
+                bookIndex++;
 
                 foreach (var author in book.Authors)
-                    InsertAuthor(command, author, book.Id);
-
+                {
+                    InsertAuthor(command, author, book.Id, authorIndex);
+                    
+                    authorIndex++;
+                }
             }
 
             transaction.Commit();
@@ -67,33 +74,35 @@ public class BookWriter : IWriteBooks
         }
     }
 
-    private void InsertBook(SqlCommand command, Book book)
+    private void InsertBook(SqlCommand command, Book book, int index)
     {
         // build sql or call sp to insert book
         // Create book
         command.CommandType = CommandType.Text;
-        command.CommandText = "INSERT INTO [dbo].[Books] (Category, Title, Price) VALUES @Category, @Title, @Price";
-        command.Parameters.AddWithValue("@Category", book.Category);
-        command.Parameters.AddWithValue("@Title", book.Title);
-        command.Parameters.AddWithValue("@Price", book.Price);
+        command.CommandText = $"INSERT INTO [dbo].[Books] (Id, Category, Title, Price) VALUES (@Id{index}, @Category{index}, @Title{index}, @Price{index})";
+        command.Parameters.AddWithValue($"@Id{index}", book.Id);
+        command.Parameters.AddWithValue($"@Category{index}", book.Category);
+        command.Parameters.AddWithValue($"@Title{index}", book.Title);
+        command.Parameters.AddWithValue($"@Price{index}", book.Price);
 
         command.ExecuteNonQuery();
     }
 
-    private void InsertAuthor(SqlCommand command, Author author, Guid bookId)
+    private void InsertAuthor(SqlCommand command, Author author, Guid bookId, int index)
     {
         // Create author
         command.CommandType = CommandType.Text;
-        command.CommandText = "INSERT INTO [dbo].[Authors] (Name) VALUES @Name";
-        command.Parameters.AddWithValue("@Name", author.Name);
+        command.CommandText = $"INSERT INTO [dbo].[Authors] (Id, Name) VALUES (@AuthorId{index}, @Name{index})";
+        command.Parameters.AddWithValue($"@AuthorId{index}", author.Id);
+        command.Parameters.AddWithValue($"@Name{index}", author.Name);
 
         command.ExecuteNonQuery();
 
         // Create link between author and book
         command.CommandType = CommandType.Text;
-        command.CommandText = "INSERT INTO [dbo].[BookAuthors] (BookId, AuthorId) VALUES @BookId, @AuthorId";
-        command.Parameters.AddWithValue("@BookId", bookId);
-        command.Parameters.AddWithValue("@AuthorId", author.Id);
+        command.CommandText = $"INSERT INTO [dbo].[BookAuthors] (BookId, AuthorId) VALUES (@BookId{index}, @Author2Id{index})";
+        command.Parameters.AddWithValue($"@BookId{index}", bookId);
+        command.Parameters.AddWithValue($"@Author2Id{index}", author.Id);
 
         command.ExecuteNonQuery();
     }
